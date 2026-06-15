@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnkaOS v33.2 - Enterprise Connect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;700&family=Azeret+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #020202;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Urbanist', sans-serif;
+            overflow: hidden;
+            color: #fff;
+        }
+        .main-container {
+            width: 1320px;
+            height: 800px;
+            background-color: #000;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+            position: relative;
+            border: 1px solid rgba(222, 255, 154, 0.15);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.9);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .brand-zone {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        h2.main-title { font-size: 34px; font-weight: 700; color: #f5f5f5; letter-spacing: -1px; line-height: 1; }
+        h2.main-title span { color: #deff9a; }
+        
+        /* ŞİRKET LİNKLERİ NETWORK ALANI */
+        .company-network {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .net-link {
+            font-family: 'Azeret Mono', monospace;
+            font-size: 11px;
+            color: #daffde;
+            text-decoration: none;
+            opacity: 0.6;
+            transition: all 0.2s;
+        }
+        .net-link:hover { opacity: 1; color: #deff9a; }
+
+        .tab-nav { display: flex; gap: 6px; }
+        .tab-btn {
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #daffde;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Azeret Mono', monospace;
+            font-size: 11px;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { background: rgba(222, 255, 154, 0.1); border-color: #deff9a; }
+        .tab-btn.active { background: #deff9a; color: #000; border-color: #deff9a; font-weight: 700; }
+        .content-area { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .tab-pane { display: none; height: 100%; grid-template-columns: repeat(3, 1fr); gap: 12px; overflow-y: auto; padding-right: 5px; }
+        .tab-pane.active { display: grid; }
+        
+        .armor-pane { display: none; height: 100%; grid-template-columns: 1fr 1fr; gap: 20px; overflow-y: auto; }
+        .armor-pane.active { display: grid; }
+        .armor-column { background: rgba(10,10,10,0.5); border: 1px solid rgba(255,255,255,0.03); border-radius: 14px; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+        .armor-column h4 { color: #deff9a; margin-bottom: 5px; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .card {
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .card:hover { background: #111; border-color: #deff9a; transform: scale(1.01); }
+        .card h3 { color: #deff9a; font-size: 16px; margin-bottom: 6px; }
+        .card p { font-size: 12px; color: #daffde; opacity: 0.7; }
+        
+        .dashboard-footer {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 20px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .ai-zone { display: flex; flex-direction: column; gap: 6px; }
+        .ai-zone p { font-size: 11px; color: #deff9a; font-weight: 700; }
+        .input-row { display: flex; gap: 10px; }
+        input[type="text"] {
+            flex-grow: 1;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            padding: 10px;
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Urbanist', sans-serif;
+            font-size: 13px;
+        }
+        input[type="text"]:focus { border-color: #deff9a; outline: none; }
+        .btn-ai { background: #deff9a; color: #000; border: none; padding: 0 15px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 11px; }
+        .terminal { background: #000; border: 1px solid #1a1a1a; border-radius: 12px; height: 90px; padding: 12px; font-family: 'Azeret Mono', monospace; font-size: 11px; color: #00ff66; overflow-y: auto; }
+        .status-bar { text-align: center; color: #deff9a; font-weight: 700; font-size: 12px; margin-top: 5px; min-height: 15px; }
+        
+        .lib-container { grid-column: span 3; display: flex; flex-direction: column; gap: 15px; height: 100%; overflow: hidden; }
+        .lib-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; overflow-y: auto; max-height: 380px; padding-right: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="header">
+        <div class="brand-zone">
+            <h2 class="main-title">ANKAOS <span>V33.2</span> OVERLORD</h2>
+            <div class="company-network">
+                <a href="https://github.com/AnkaOS23/ANKA-SIRKET/tree/main" target="_blank" class="net-link">🐙 GitHub</a>
+                <span style="color:rgba(255,255,255,0.2); font-size:11px;">|</span>
+                <a href="https://tr.pinterest.com/anka3os23/_pins/" target="_blank" class="net-link">📌 Pinterest</a>
+                <span style="color:rgba(255,255,255,0.2); font-size:11px;">|</span>
+                <a href="https://www.youtube.com/@AnkaMC-f2g" target="_blank" class="net-link">▶️ YouTube</a>
+            </div>
+        </div>
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="showTab(event, 'god-gear')">🛡️ God Weapons</button>
+            <button class="tab-btn" onclick="showTab(event, 'armor-station')">👕 Zırh İstasyonu</button>
+            <button class="tab-btn" onclick="showTab(event, 'classic-mods')">⚡ Klasik Modüller</button>
+            <button class="tab-btn" onclick="showTab(event, 'system')">🏰 Sistem</button>
+            <button class="tab-btn" onclick="showTab(event, 'library')">🔍 Matris (SMP+)</button>
+        </div>
+    </div>
+
+    <div class="content-area">
+        <div id="god-gear" class="tab-pane active">
+            <div class="card" onclick="copy('one_shot')">
+                <h3>⚔️ One-Shot Sword</h3>
+                <p>Netherite: Sharpness 1000, Fire Aspect 10, Looting 10. Tek atar.</p>
+            </div>
+            <div class="card" onclick="copy('survival_sword')">
+                <h3>🗡️ Max Survival Sword</h3>
+                <p>Sharpness 5, Sweeping Edge 3, Looting 3, Fire Aspect 2. Vanilla kralı.</p>
+            </div>
+            <div class="card" onclick="copy('god_bow')">
+                <h3>🏹 Infinite God Bow</h3>
+                <p>Infinity, Flame, Power 10, Unbreaking 10. Sınırsız alevli ok atar.</p>
+            </div>
+            <div class="card" onclick="copy('god_elytra')">
+                <h3>🪶 God Elytra</h3>
+                <p>Unbreaking 10 ve Mending 1 basılı yıpranmaz elitra.</p>
+            </div>
+            <div class="card" onclick="copy('ultra_pick')">
+                <h3>⛏️ Efficiency 10 Kazma</h3>
+                <p>Fortune 5, Unbreaking 10, Mending. Madenleri eritir.</p>
+            </div>
+            <div class="card" onclick="copy('ultra_axe')">
+                <h3>🪓 Büyülü Netherite Balta</h3>
+                <p>Efficiency 10, Unbreaking 10, Fortune 5, Mending basılı devasa balta.</p>
+            </div>
+            <div class="card" onclick="copy('ankabot_golem')" style="grid-column: span 3;">
+                <h3>🤖 Summon Anka Bot (Demir Golem Koruyucu)</h3>
+                <p>Seni koruyan, canavarları gökyüzüne fırlatan 500 Can değerinde ölümsüz koruyucun!</p>
+            </div>
+        </div>
+
+        <div id="armor-station" class="armor-pane">
+            <div class="armor-column">
+                <h4>🔮 Ultra Netherite Parçaları</h4>
+                <div class="card" onclick="copy('n_helmet')"><h3>👑 Netherite Kask (Prot 10)</h3><p>Tıkla ve kask kodunu kopyala</p></div>
+                <div class="card" onclick="copy('n_chest')"><h3>👕 Netherite Göğüslük (Prot 10)</h3><p>Tıkla ve göğüslük kodunu kopyala</p></div>
+                <div class="card" onclick="copy('n_legs')"><h3>👖 Netherite Pantolon (Prot 10)</h3><p>Tıkla ve pantolon kodunu kopyala</p></div>
+                <div class="card" onclick="copy('n_boots')"><h3>🥾 Netherite Bot (Prot 10)</h3><p>Tıkla ve bot kodunu kopyala</p></div>
+                <div class="card" onclick="copy('n_set_all')" style="border-color:#deff9a;"><h3>📦 Full Netherite Set Al</h3><p>Tüm parçaları tek komutla çeker</p></div>
+            </div>
+            <div class="armor-column">
+                <h4>💎 Ultra Elmas Parçaları</h4>
+                <div class="card" onclick="copy('d_helmet')"><h3>👑 Elmas Kask (Prot 10)</h3><p>Tıkla ve kask kodunu kopyala</p></div>
+                <div class="card" onclick="copy('d_chest')"><h3>👕 Elmas Göğüslük (Prot 10)</h3><p>Tıkla ve göğüslük kodunu kopyala</p></div>
+                <div class="card" onclick="copy('d_legs')"><h3>👖 Elmas Pantolon (Prot 10)</h3><p>Tıkla ve pantolon kodunu kopyala</p></div>
+                <div class="card" onclick="copy('d_boots')"><h3>🥾 Elmas Bot (Prot 10)</h3><p>Tıkla ve bot kodunu kopyala</p></div>
+                <div class="card" onclick="copy('d_set_all')" style="border-color:#deff9a;"><h3>📦 Full Elmas Set Al</h3><p>Tüm parçaları tek komutla çeker</p></div>
+            </div>
+        </div>
+
+        <div id="classic-mods" class="tab-pane">
+            <div class="card" onclick="copy('java_tnt')">
+                <h3>🚀 Göz Hizası TNT Fırlatıcı</h3>
+                <p>Baktığın yöne doğru havadan TNT blokları fırlatır.</p>
+            </div>
+            <div class="card" onclick="copy('trigger_raid')">
+                <h3>🏹 Baskın Çağırıcı (Bad Omen 5)</h3>
+                <p>Köyü korumak ya da savaş başlatmak için Bad Omen V basar.</p>
+            </div>
+            <div class="card" onclick="copy('house')">
+                <h3>🏡 10x Kare Tahta Ev Yapıcı</h3>
+                <p>Hızlıca korunaklı meşe tahtasından ev inşa eder.</p>
+            </div>
+            <div class="card" onclick="copy('light_1')">
+                <h3>⚡ Yıldırım Asası (Mor Blok)</h3>
+                <p>En yakın canlıya otomatik yıldırım düşürme döngüsü.</p>
+            </div>
+            <div class="card" onclick="copy('xray')">
+                <h3>👁️ Oyuncu Parlatma Radarı</h3>
+                <p>Duvar arkasındaki tüm oyuncuları parlatıp yerini belli eder.</p>
+            </div>
+            <div class="card" onclick="copy('clear_10x10')">
+                <h3>🧹 10x10 Alan Temizleyici</h3>
+                <p>Önündeki alanı hava bloğuyla doldurup temizler.</p>
+            </div>
+        </div>
+
+        <div id="system" class="tab-pane">
+            <div class="card" onclick="copy('cage')">
+                <h3>🔮 Dragon Cage (13x13x8)</h3>
+                <p>Yumurtayı korumak için içi boş obsidiyen kafes çeker.</p>
+            </div>
+            <div class="card" onclick="copy('keep_inv')">
+                <h3>📦 Keep Inventory True</h3>
+                <p>Ölünce eşyaların ve XP'lerin gitmesini kalıcı olarak kapatır.</p>
+            </div>
+        </div>
+
+        <div id="library" class="tab-pane">
+            <div class="lib-container">
+                <input type="text" id="searchBar" placeholder="Matriste ara (Elma, Totem, İnci, XP, Ejderha, Köylü)..." oninput="filterLib()">
+                <div id="libGrid" class="lib-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-footer">
+        <div class="ai-zone">
+            <p>🤖 ANKAAI ASİSTAN PROTOKOLÜ</p>
+            <div class="input-row">
+                <input type="text" id="aiQuery" placeholder="İngilizce veya Türkçe eşya adı yaz...">
+                <button class="btn-ai" onclick="askAI()">ÜRET</button>
+            </div>
+        </div>
+        <div id="terminal" class="terminal">
+            [SYSTEM] AnkaOS v33.2 Enterprise Linkleri Entegre Edildi.<br>
+            [LOG] GitHub, Pinterest ve YouTube bağlantıları ana sunucuya bağlandı.
+        </div>
+    </div>
+    
+    <div id="status" class="status-bar"></div>
+</div>
+
+<script>
+    const term = document.getElementById('terminal');
+    const status = document.getElementById('status');
+
+    function showTab(evt, name) {
+        document.querySelectorAll('.tab-pane, .armor-pane').forEach(p => p.style.display = 'none');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        
+        const target = document.getElementById(name);
+        if(name === 'library' || name === 'armor-station') {
+            target.style.display = name === 'library' ? 'block' : 'grid';
+        } else {
+            target.style.display = 'grid';
+        }
+        
+        evt.currentTarget.classList.add('active');
+        log("Sekme değiştirildi: " + name.toUpperCase());
+    }
+
+    function log(msg) {
+        const t = new Date().toLocaleTimeString();
+        term.innerHTML += `<br>[${t}] ${msg}`;
+        term.scrollTop = term.scrollHeight;
+    }
+
+    function flash(msg) {
+        status.innerText = msg.toUpperCase() + " KOPYALANDI!";
+        setTimeout(() => { status.innerText = ""; }, 2000);
+    }
+
+    function copy(key) {
+        let cmd = "";
+        const enc = "{Enchantments:[{id:protection,lvl:10},{id:unbreaking,lvl:10},{id:mending,lvl:1}]}";
+        
+        const gear = {
+            one_shot: "/give @s netherite_sword{Enchantments:[{id:sharpness,lvl:1000},{id:unbreaking,lvl:10},{id:fire_aspect,lvl:10}]} 1",
+            survival_sword: "/give @s netherite_sword{Enchantments:[{id:sharpness,lvl:5},{id:unbreaking,lvl:3},{id:looting,lvl:3},{id:sweeping,lvl:3},{id:fire_aspect,lvl:2}]} 1",
+            god_bow: "/give @s bow{Enchantments:[{id:power,lvl:10},{id:flame,lvl:1},{id:infinity,lvl:1},{id:unbreaking,lvl:10}]} 1",
+            god_elytra: "/give @s elytra{Enchantments:[{id:unbreaking,lvl:10},{id:mending,lvl:1}]} 1",
+            ultra_pick: "/give @s netherite_pickaxe{Enchantments:[{id:efficiency,lvl:10},{id:fortune,lvl:5},{id:unbreaking,lvl:10},{id:mending,lvl:1}]} 1",
+            ultra_axe: "/give @s netherite_axe{Enchantments:[{id:efficiency,lvl:10},{id:unbreaking,lvl:10},{id:fortune,lvl:5},{id:mending,lvl:1}]} 1",
+            ankabot_golem: "/summon iron_golem ~ ~ ~ {PlayerCreated:1b,CustomName:'\"§4Anka Bot Koruyucu\"',CustomNameVisible:1b,Attributes:[{Name:\"generic.max_health\",Base:500f}],Health:500f}",
+            
+            n_helmet: "/give @s netherite_helmet" + enc + " 1",
+            n_chest: "/give @s netherite_chestplate" + enc + " 1",
+            n_legs: "/give @s netherite_leggings" + enc + " 1",
+            n_boots: "/give @s netherite_boots" + enc + " 1",
+            n_set_all: "/give @s netherite_helmet" + enc + " 1\n/give @s netherite_chestplate" + enc + " 1\n/give @s netherite_leggings" + enc + " 1\n/give @s netherite_boots" + enc + " 1",
+            
+            d_helmet: "/give @s diamond_helmet" + enc + " 1",
+            d_chest: "/give @s diamond_chestplate" + enc + " 1",
+            d_legs: "/give @s diamond_leggings" + enc + " 1",
+            d_boots: "/give @s diamond_boots" + enc + " 1",
+            d_set_all: "/give @s diamond_helmet" + enc + " 1\n/give @s diamond_chestplate" + enc + " 1\n/give @s diamond_leggings" + enc + " 1\n/give @s diamond_boots" + enc + " 1",
+            
+            java_tnt: "/execute as @a at @s anchored eyes run summon minecraft:tnt ^ ^ ^4 {Motion:[0.0,0.0,0.0],Fuse:40}",
+            trigger_raid: "/effect give @s bad_omen 99999 4",
+            house: "/fill ~ ~ ~ ~5 ~9 ~5 oak_planks outline",
+            light_1: "/execute at @a[scores={tiklama=1..}] run summon lightning_bolt",
+            xray: "/effect give @e[type=player,distance=..40] glowing 30 0",
+            clear_10x10: "/fill ~-5 ~ ~-5 ~5 ~9 ~5 air",
+            cage: "/fill ~-6 ~ ~-6 ~6 ~7 ~6 obsidian outline",
+            keep_inv: "/gamerule keepInventory true"
+        };
+
+        cmd = gear[key] || "";
+        navigator.clipboard.writeText(cmd);
+        log("İşlem: " + key);
+        flash(key);
+    }
+
+    const libItems = [
+        {n: "64x Büyülü Altın Elma", id: "enchanted_golden_apple 64"},
+        {n: "Ölümsüzlük Totemi", id: "totem_of_undying 1"},
+        {n: "Ender İnci 16x", id: "ender_pearl 16"},
+        {n: "Deneyim Şişesi 64x", id: "experience_bottle 64"},
+        {n: "Ejderha Yumurtası", id: "dragon_egg 1"},
+        {n: "Köylü Yumurtası 64x", id: "villager_spawn_egg 64"},
+        {n: "Hasarsız Roket 64x", id: "firework_rocket{Fireworks:{Flight:3b}} 64"},
+        {n: "Obsidiyen 64x", id: "obsidian 64"},
+        {n: "Fener (Beacon)", id: "beacon 1"},
+        {n: "Büyülü Kitap: Tamir", id: "enchanted_book{StoredEnchantments:[{id:mending,lvl:1}]}"},
+        {n: "Altın Blok 64x", id: "gold_block 64"},
+        {n: "Şulker Kutusu (Boş)", id: "shulker_box 1"}
+    ];
+
+    function filterLib() {
+        const s = document.getElementById('searchBar').value.toLowerCase();
+        const grid = document.getElementById('libGrid');
+        grid.innerHTML = "";
+        libItems.filter(i => i.n.toLowerCase().includes(s)).forEach(i => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style.padding = '12px';
+            card.onclick = () => {
+                navigator.clipboard.writeText('/give @s ' + i.id);
+                log('Kütüphane: ' + i.n);
+                flash(i.n);
+            };
+            card.innerHTML = `<h3>${i.n}</h3>`;
+            grid.appendChild(card);
+        });
+    }
+
+    function askAI() {
+        const q = document.getElementById('aiQuery').value.toLowerCase().trim();
+        if(!q) return;
+        let res = q.replace(/ /g, "_");
+        const cmd = `/give @s minecraft:${res} 1`;
+        navigator.clipboard.writeText(cmd);
+        log("AnkaAI Sentezledi: " + cmd);
+        flash("Asistan");
+    }
+
+    filterLib();
+</script>
+</body>
+</html>
